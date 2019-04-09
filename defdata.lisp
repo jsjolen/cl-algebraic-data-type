@@ -22,6 +22,8 @@ property list:
 
     * :INCLUDE <adt-type>: Specifies whether another defined ADT
       should be inherited.
+    * :PARAMETRIC-ON (<clause>*): Specifies symbols which
+      the ADT is parametric on and their concrete types.
 
 Constructors is a list of clauses with the following grammar:
 
@@ -58,6 +60,8 @@ functions."
         (include (or (and (listp adt-name)
                           (getf (rest adt-name) ':include))
                      'algebraic-data-type))
+	(parametric-on (and (listp adt-name)
+			    (getf (rest adt-name) ':parametric-on)))
         (object (gensym "OBJECT-"))
         (stream (gensym "STREAM-"))
         (depth (gensym "DEPTH-"))
@@ -74,12 +78,20 @@ functions."
              type."
             adt-name
             include)
+    (assert (or (and (eq include 'algebraic-data-type) parametric-on)
+		(and include (not parametric-on)))
+	    ()
+	    "When defining the algebraic data type ~S, the :INCLUDE option
+and the :PARAMETRIC-ON option was specified, but a parametric ADT is not allowed to inherit any other adt.")
 
     ;; Add constructors and their arity to the database.
     (flet ((constructor-and-arity (ctor)
              (if (listp ctor)
                  (list (first ctor) (length (rest ctor)))
-                 (list ctor 0))))
+                 (list ctor 0)))
+	   (constructor-and-types (ctor)
+	     (if (listp ctor)
+		 (list (first ctor) (rest ctor)))))
       (set-constructors adt-name (append (get-constructors include)
                                          (mapcar #'constructor-and-arity constructors))))
 
