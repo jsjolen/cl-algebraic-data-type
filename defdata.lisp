@@ -83,7 +83,6 @@ functions."
 	    ()
 	    "When defining the algebraic data type ~S, the :INCLUDE option
 and the :PARAMETRIC-ON option was specified, but a parametric ADT is not allowed to inherit any other adt.")
-
     ;; Add constructors and their arity to the database.
     (flet ((constructor-and-arity (ctor)
              (if (listp ctor)
@@ -91,10 +90,17 @@ and the :PARAMETRIC-ON option was specified, but a parametric ADT is not allowed
                  (list ctor 0)))
 	   (constructor-and-types (ctor)
 	     (if (listp ctor)
-		 (list (first ctor) (rest ctor)))))
-      (set-constructors adt-name (append (get-constructors include)
-                                         (mapcar #'constructor-and-arity constructors))))
-
+		 (list* (first ctor) (rest ctor)))))
+      (set-constructors adt-name (append (get-constructors include) ; = NIL when :PARAMETRIC-ON used
+                                         (mapcar #'constructor-and-arity constructors))
+			parametric-on (mapcar #'constructor-and-types constructors)))
+    ;; Replace parametric variable with T
+    (when parametric-on
+      (setf constructors
+	    (loop for ctor in constructors collect
+		 (if (listp ctor)
+		     (substitute t parametric-on ctor)
+		     ctor))))
     (flet ((make-printer (name &optional (nfields 0))
              "Make a printer function for the structs."
              `(lambda (,object ,stream ,depth)

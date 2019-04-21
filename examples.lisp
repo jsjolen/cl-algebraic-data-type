@@ -32,3 +32,7 @@
 (defun mirror-point! (pt)
   (with-data (rect x y) pt
     (set-data pt (rect y x))))
+
+(defdata (liszt :parametric-on k)
+  (kons k liszt)
+  knil)
