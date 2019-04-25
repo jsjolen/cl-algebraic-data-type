@@ -38,11 +38,11 @@
              exists?)
         (values (mapcar #'copy-list (first ctors)) t)
         (values nil nil))))
-(defun get-parametric-var (adt)
+(defun get-parametric-vars (adt)
   (multiple-value-bind (ctors/par/t exists?) (gethash adt *constructors*)
     (if (and (algebraic-data-type-p adt)
              exists?)
-	(values (second ctors/par/t) t)
+	(values (copy-list (second ctors/par/t)) t)
         (values nil nil))))
 (defun get-types (adt)
   (multiple-value-bind (ctors/par/t exists?) (gethash adt *constructors*)
@@ -107,3 +107,7 @@
              :always (keywordp key)
              :do (setf keys (remove key keys)))
        (null keys)))
+
+(defun ensure-list (x)
+  (if (listp x) x
+      (list x)))

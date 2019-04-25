@@ -61,7 +61,7 @@ functions."
                           (getf (rest adt-name) ':include))
                      'algebraic-data-type))
 	(parametric-on (and (listp adt-name)
-			    (getf (rest adt-name) ':parametric-on)))
+			    (ensure-list (getf (rest adt-name) ':parametric-on))))
         (object (gensym "OBJECT-"))
         (stream (gensym "STREAM-"))
         (depth (gensym "DEPTH-"))
@@ -96,11 +96,13 @@ and the :PARAMETRIC-ON option was specified, but a parametric ADT is not allowed
 			parametric-on (mapcar #'constructor-and-types constructors)))
     ;; Replace parametric variable with T
     (when parametric-on
-      (setf constructors
-	    (loop for ctor in constructors collect
-		 (if (listp ctor)
-		     (substitute t parametric-on ctor)
-		     ctor))))
+      (loop for par-var in parametric-on do
+	   (setf constructors
+		 (loop for ctor in constructors collect 
+		      (if (listp ctor)
+			  (substitute t par-var ctor)
+			  ctor)))))
+    
     (flet ((make-printer (name &optional (nfields 0))
              "Make a printer function for the structs."
              `(lambda (,object ,stream ,depth)
