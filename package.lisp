@@ -16,4 +16,6 @@
    #:algebraic-data-type-p              ; FUNCTION (PREDICATE)
    #:algebraic-data-value-p             ; FUNCTION (PREDICATE)
    #:get-constructors                   ; FUNCTION
+   #:get-parametric-vars                ; FUNCTION
+   #:get-types                          ; FUNCTION
    ))
