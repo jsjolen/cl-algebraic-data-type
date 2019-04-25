@@ -5,8 +5,8 @@
 
 ;;; Maybe
 
-(defdata maybe
-  (just t)
+(defdata (maybe :parametric-on a)
+  (just a)
   nothing)
 
 (defun maybe-or-else (m else)
@@ -16,11 +16,9 @@
 
 
 ;;; Either
-
-(defdata either
-  (left t)
-  (right t))
-
+(defdata (either :parametric-on (l r))
+  (left l)
+  (right r))
 
 ;;; Point
 
@@ -36,3 +34,7 @@
 (defdata (liszt :parametric-on k)
   (kons k liszt)
   knil)
+;; https://gitlab.haskell.org/ghc/ghc/wikis/commentary/compiler/derive-functor
+(defun derive-functor (adt) adt)
+(defun derive-foldable (adt) adt)
+(defun derive-traversable (adt) adt)
